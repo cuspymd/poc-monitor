@@ -1,5 +1,5 @@
 #define MyAppName "POC Monitor"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.3.0"
 #define MyAppPublisher "Dev.I"
 #define MyAppURL "https://your-website.com"
 #define MyAppExeName "poc-monitor.exe"
@@ -36,7 +36,7 @@ Name: "{app}\logs"
 Name: "{app}\output"
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+; 백그라운드 서비스이므로 시작 메뉴 아이콘 불필요
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{userstartup}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
@@ -231,5 +231,13 @@ begin
   TerminateAppProcess(ExpandConstant('{#MyAppExeName}'), False);
 end;
 
+// 프로그램이 이미 실행 중인지 확인하는 함수
+function IsAppRunning(const AppExeName: string): Boolean;
+var
+  ProcessID: DWORD;
+begin
+  Result := FindProcessByName(AppExeName, ProcessID);
+end;
+
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Flags: nowait runhidden
+Filename: "{app}\{#MyAppExeName}"; Check: "not IsAppRunning('{#MyAppExeName}')"; Flags: nowait runhidden
